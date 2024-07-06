@@ -45,10 +45,11 @@ public:
 			std::lock_guard<std::mutex> loc(mut.m);
 			mut.writeQue.emplace(this);
 		}
-		restart:
-		while (mut.readCount > 0 || mut.writing == true);
-		if (mut.writeQue.front() != this)
-			goto restart;
+		do
+		{
+			while (mut.readCount > 0 || mut.writing == true);
+		} 
+		while (reinterpret_cast<std::uintptr_t>(mut.writeQue.front()) != reinterpret_cast<std::uintptr_t>(this));
 		mut.writing = true;
 	}
 	~writerLock()
@@ -65,10 +66,10 @@ std::variant<readerLock, writerLock> createReaderWriterLock(T& obj, readerWriter
 	//static_assert(!std::is_pointer<T>);
 	if constexpr (!std::is_const<T>())
 	{
-		return std::in_place_type_t<writerLock>( mut );
+		return std::variant<readerLock, writerLock>(std::in_place_type_t<writerLock>(), mut );
 	}
 	else
 	{
-		return std::in_place_type_t<readerLock>(mut);
+		return std::variant<readerLock, writerLock>(std::in_place_type_t<readerLock>(), mut);
 	}
 }
