@@ -23,6 +23,8 @@ int main(int argc, char* argv[])
     std::cout <<"mean: " << stats::compute_mean(dataSet.begin(), dataSet.end()) 
         <<" standard deviation: " << stats::compute_standard_deviation(dataSet.begin(), dataSet.end())
         <<" variance: " <<stats::compute_variance(dataSet.begin(), dataSet.end()) << '\n';
+    std::cout << "standard deviation pop: " << stats::compute_standard_deviation_population(dataSet.begin(), dataSet.end())
+        << " variance pop: " << stats::compute_variance_population(dataSet.begin(), dataSet.end()) << '\n';
     printf("hello from %s!\n", "LinuxStats");
     return 0;
 }

@@ -100,6 +100,54 @@ namespace stats
 	}
 
 	template<typename IterT, typename Fun>
+	constexpr typename std::iterator_traits<IterT>::value_type compute_standard_deviation_population(IterT start, IterT end, Fun func) requires mean_computable<IterT, typename std::iterator_traits<IterT>::value_type>&& square_computable<typename std::iterator_traits<IterT>::value_type>&& square_root_computable <typename std::iterator_traits<IterT>::value_type, Fun>
+	{
+		auto begin = start;
+		auto sum = *start * 0.0;
+		std::vector<typename std::iterator_traits<IterT>::value_type> temp;
+		while (start != end)
+		{
+			temp.emplace_back(*start);
+			sum += *start;
+			++start;
+		}
+		auto mean = sum / temp.size();
+		auto variance = *begin * 0.0;
+		for (const auto& val : temp)
+		{
+			variance += (val - mean) * (val - mean);
+		}
+		return func(variance / (temp.size()));
+	}
+
+	template<typename IterT>
+	constexpr typename std::iterator_traits<IterT>::value_type compute_standard_deviation_population(IterT start, IterT end) requires mean_computable<IterT, typename std::iterator_traits<IterT>::value_type>&& square_computable<typename std::iterator_traits<IterT>::value_type>&& std::floating_point<typename std::iterator_traits<IterT>::value_type>
+	{
+		return compute_standard_deviation_population(start, end, [](auto val) {return std::sqrt(val); });
+	}
+
+	template<typename IterT>
+	constexpr typename std::iterator_traits<IterT>::value_type compute_variance_population(IterT start, IterT end) requires mean_computable<IterT, typename std::iterator_traits<IterT>::value_type>&& square_computable<typename std::iterator_traits<IterT>::value_type>
+	{
+		auto begin = start;
+		auto sum = *start * 0.0;
+		std::vector<typename std::iterator_traits<IterT>::value_type> temp;
+		while (start != end)
+		{
+			temp.emplace_back(*start);
+			sum += *start;
+			++start;
+		}
+		auto mean = sum / temp.size();
+		auto variance = *begin * 0.0;
+		for (const auto& val : temp)
+		{
+			variance += (val - mean) * (val - mean);
+		}
+		return variance / (temp.size());
+	}
+
+	template<typename IterT, typename Fun>
 	constexpr typename std::iterator_traits<IterT>::value_type compute_skewness(IterT start, IterT end, Fun func) requires mean_computable<IterT, typename std::iterator_traits<IterT>::value_type> && square_computable<typename std::iterator_traits<IterT>::value_type> && square_root_computable <typename std::iterator_traits<IterT>::value_type,Fun>
 	{
 		auto begin = start;
